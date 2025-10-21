@@ -1,6 +1,7 @@
+// src/pages/home.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import MovieCard from "../components/movieCard";
+import SearchBar from "../components/searchBar";
 import { useFetchMovies } from "../hooks/useFetchMovies";
 import { useFavorites } from "../hooks/usefav";
 import strangerThingsImg from "../assets/images/stranger things.jpg";
@@ -9,11 +10,23 @@ function Home() {
   const { movies, loading, error } = useFetchMovies("https://api.tvmaze.com/shows");
   const [visibleCount, setVisibleCount] = useState(30);
 
-  // ✅ Use the custom favorites hook here
-  const { favorites, addToFavorites } = useFavorites();
+  // Favorites hook
+  const { addToFavorites } = useFavorites();
+
+  // Search state
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter movies based on search term
+  const filteredMovies = movies.filter((movie) =>
+    movie.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Prevent default form submit
+  const handleSearchSubmit = (e) => e.preventDefault();
 
   return (
-    <div className="relative">
+    <div className="relative pt-24"> {/* pt-24 avoids navbar overlap */}
+      
       {/* Hero Section */}
       <div
         className="relative h-screen bg-cover bg-center flex items-center justify-center text-center text-white"
@@ -33,29 +46,37 @@ function Home() {
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="p-8 max-w-md mx-auto">
+        <SearchBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onSearchSubmit={handleSearchSubmit}
+        />
+      </div>
+
       {/* Movie Grid */}
       <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
 
-{movies.slice(0, visibleCount).map((movie) => (
-  <MovieCard
-    key={movie.id}
-    movie={{
-      title: movie.name,
-      poster: movie.image?.medium || "/placeholder.jpg",
-      genre: movie.genres?.join(", "),
-      description: movie.summary?.replace(/<[^>]+>/g, ""),
-      id: movie.id, // pass id to MovieCard for linking
-    }}
-    onAddToFavorites={addToFavorites} 
-  />
-))}
-
+        {filteredMovies.slice(0, visibleCount).map((movie) => (
+          <MovieCard
+            key={movie.id}
+            movie={{
+              id: movie.id,
+              title: movie.name,
+              poster: movie.image?.medium || "/placeholder.jpg",
+              genre: movie.genres?.join(", "),
+              description: movie.summary?.replace(/<[^>]+>/g, ""),
+            }}
+            onAddToFavorites={addToFavorites}
+          />
+        ))}
       </div>
 
       {/* Show More Button */}
-      {visibleCount < movies.length && (
+      {visibleCount < filteredMovies.length && (
         <div className="col-span-full text-center mt-6">
           <button
             onClick={() => setVisibleCount((prev) => prev + 30)}
