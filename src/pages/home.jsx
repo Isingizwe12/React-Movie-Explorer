@@ -8,30 +8,37 @@ import strangerThingsImg from "../assets/images/stranger things.jpg";
 
 function Home() {
   const { movies, loading, error } = useFetchMovies("https://api.tvmaze.com/shows");
+  const { addToFavorites } = useFavorites();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("All");
   const [visibleCount, setVisibleCount] = useState(30);
 
-  // Favorites hook
-  const { addToFavorites } = useFavorites();
+  // Notification state
+  const [notification, setNotification] = useState("");
 
-  // Search state
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Category filter state
-  const [selectedGenre, setSelectedGenre] = useState("All");
-
-  // Extract all genres for filter buttons
   const allGenres = Array.from(new Set(movies.flatMap(movie => movie.genres)));
 
-  // Filter movies by search and genre
   const filteredMovies = movies
     .filter(movie => movie.name.toLowerCase().includes(searchTerm.toLowerCase()))
     .filter(movie => selectedGenre === "All" ? true : movie.genres.includes(selectedGenre));
 
-  // Prevent default form submit
+  const handleAddToFavorites = (movie) => {
+    addToFavorites(movie);
+    setNotification(`${movie.title} is added to favorites`);
+    setTimeout(() => setNotification(""), 3000); // disappear after 3 seconds
+  };
+
   const handleSearchSubmit = (e) => e.preventDefault();
 
   return (
-    <div className="relative">
+    <div className="relative ">
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 transition">
+          {notification}
+        </div>
+      )}
+
       {/* Hero Section */}
       <div
         className="relative h-screen bg-cover bg-center flex items-center justify-center text-center text-white"
@@ -45,13 +52,10 @@ function Home() {
           <p className="text-lg text-gray-200 mb-6 drop-shadow-md">
             Dive into the mysterious world and discover your favorite episodes.
           </p>
-          <button className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition">
-            Watch Now
-          </button>
         </div>
       </div>
 
-      {/* Search Bar */}
+      {/* Search */}
       <div className="p-8 max-w-md mx-auto">
         <SearchBar
           searchTerm={searchTerm}
@@ -84,12 +88,12 @@ function Home() {
               genre: movie.genres?.join(", "),
               description: movie.summary?.replace(/<[^>]+>/g, ""),
             }}
-            onAddToFavorites={addToFavorites}
+            onAddToFavorites={handleAddToFavorites}
           />
         ))}
       </div>
 
-      {/* Show More Button */}
+      {/* Show More */}
       {visibleCount < filteredMovies.length && (
         <div className="col-span-full text-center mt-6">
           <button
