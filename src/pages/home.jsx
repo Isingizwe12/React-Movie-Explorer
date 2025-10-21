@@ -1,7 +1,7 @@
-// src/pages/home.jsx
 import React, { useState } from "react";
 import MovieCard from "../components/movieCard";
 import SearchBar from "../components/searchBar";
+import CategoryFilter from "../components/categoryFilter";
 import { useFetchMovies } from "../hooks/useFetchMovies";
 import { useFavorites } from "../hooks/usefav";
 import strangerThingsImg from "../assets/images/stranger things.jpg";
@@ -16,17 +16,22 @@ function Home() {
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter movies based on search term
-  const filteredMovies = movies.filter((movie) =>
-    movie.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Category filter state
+  const [selectedGenre, setSelectedGenre] = useState("All");
+
+  // Extract all genres for filter buttons
+  const allGenres = Array.from(new Set(movies.flatMap(movie => movie.genres)));
+
+  // Filter movies by search and genre
+  const filteredMovies = movies
+    .filter(movie => movie.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(movie => selectedGenre === "All" ? true : movie.genres.includes(selectedGenre));
 
   // Prevent default form submit
   const handleSearchSubmit = (e) => e.preventDefault();
 
   return (
-    <div className="relative pt-24"> {/* pt-24 avoids navbar overlap */}
-      
+    <div className="relative">
       {/* Hero Section */}
       <div
         className="relative h-screen bg-cover bg-center flex items-center justify-center text-center text-white"
@@ -55,12 +60,21 @@ function Home() {
         />
       </div>
 
+      {/* Category Filter */}
+      <div className="px-8">
+        <CategoryFilter
+          genres={allGenres}
+          selectedGenre={selectedGenre}
+          onSelectGenre={setSelectedGenre}
+        />
+      </div>
+
       {/* Movie Grid */}
       <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
 
-        {filteredMovies.slice(0, visibleCount).map((movie) => (
+        {filteredMovies.slice(0, visibleCount).map(movie => (
           <MovieCard
             key={movie.id}
             movie={{
@@ -79,7 +93,7 @@ function Home() {
       {visibleCount < filteredMovies.length && (
         <div className="col-span-full text-center mt-6">
           <button
-            onClick={() => setVisibleCount((prev) => prev + 30)}
+            onClick={() => setVisibleCount(prev => prev + 30)}
             className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition"
           >
             Show More
