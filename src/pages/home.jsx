@@ -1,10 +1,12 @@
 import React from "react";
+import { useState } from "react";
 import MovieCard from "../components/movieCard";
 import { useFetchMovies } from "../hooks/useFetchMovies";
 import strangerThingsImg from "../assets/images/stranger things.jpg";
 
 function Home() {
   const { movies, loading, error } = useFetchMovies("https://api.tvmaze.com/shows");
+  const [visibleCount, setVisibleCount] = useState(30);
 
   return (
     <div className="relative">
@@ -31,19 +33,30 @@ function Home() {
       <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={{
-              title: movie.name,
-              poster: movie.image?.medium,
-              genre: movie.genres?.join(", "),
-              description: movie.summary?.replace(/<[^>]+>/g, ""),
-            }}
-            onAddToFavorites={(m) => console.log("Add to favorites:", m)}
-          />
-        ))}
+        {movies.slice(0, visibleCount).map((movie) => (
+  <MovieCard
+    key={movie.id}
+    movie={{
+      title: movie.name,
+      poster: movie.image?.medium,
+      genre: movie.genres?.join(", "),
+      description: movie.summary?.replace(/<[^>]+>/g, ""),
+    }}
+    onAddToFavorites={(m) => console.log("Add to favorites:", m)}
+  />
+))}
       </div>
+      {visibleCount < movies.length && (
+  <div className="col-span-full text-center mt-6">
+    <button
+      onClick={() => setVisibleCount(prev => prev + 30)}
+      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition"
+    >
+      Show More
+    </button>
+  </div>
+)}
+
     </div>
   );
 }
