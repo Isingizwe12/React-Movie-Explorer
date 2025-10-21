@@ -1,19 +1,20 @@
-import './App.css'
-import Navbar from './components/navbar'
-import Home from './pages/home'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/navbar";
+import Home from "./pages/home";
+import MovieDetails from './components/movieDetail';
+import Favorites from './pages/favorites';
 
 function App() {
-
-
   return (
-    <>
-    <Navbar />
-    <Home />
-
-
-
-    </>
-  )
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/favorites" element={<Favorites />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

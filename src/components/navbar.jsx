@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SearchBar from "./searchBar";
-
+import { Link } from "react-router-dom";
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -28,12 +28,12 @@ function Navbar() {
 
       {/* Right side - Links and Search */}
       <div className="flex items-center gap-6">
-        <ul className="hidden md:flex gap-6 font-medium text-white">
-          <li className="cursor-pointer hover:underline transition">Home</li>
-          <li className="cursor-pointer hover:underline transition">
+        <div className=" bg-black hidden md:flex gap-6 font-medium text-white">
+          <Link to='/' className="cursor-pointer hover:underline transition">Home</Link>
+          <Link to='/favorites' className="cursor-pointer hover:underline transition">
             Favorites
-          </li>
-        </ul>
+          </Link>
+        </div>
 
         {/* Search Bar */}
         <div className="hidden md:block">

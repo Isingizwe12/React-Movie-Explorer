@@ -1,16 +1,20 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import MovieCard from "../components/movieCard";
 import { useFetchMovies } from "../hooks/useFetchMovies";
+import { useFavorites } from "../hooks/usefav";
 import strangerThingsImg from "../assets/images/stranger things.jpg";
 
 function Home() {
   const { movies, loading, error } = useFetchMovies("https://api.tvmaze.com/shows");
   const [visibleCount, setVisibleCount] = useState(30);
 
+  // ✅ Use the custom favorites hook here
+  const { favorites, addToFavorites } = useFavorites();
+
   return (
     <div className="relative">
-      {/* Hero section */}
+      {/* Hero Section */}
       <div
         className="relative h-screen bg-cover bg-center flex items-center justify-center text-center text-white"
         style={{ backgroundImage: `url(${strangerThingsImg})` }}
@@ -29,34 +33,38 @@ function Home() {
         </div>
       </div>
 
-      {/* Movie grid section below hero */}
+      {/* Movie Grid */}
       <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
-        {movies.slice(0, visibleCount).map((movie) => (
+
+{movies.slice(0, visibleCount).map((movie) => (
   <MovieCard
     key={movie.id}
     movie={{
       title: movie.name,
-      poster: movie.image?.medium,
+      poster: movie.image?.medium || "/placeholder.jpg",
       genre: movie.genres?.join(", "),
       description: movie.summary?.replace(/<[^>]+>/g, ""),
+      id: movie.id, // pass id to MovieCard for linking
     }}
-    onAddToFavorites={(m) => console.log("Add to favorites:", m)}
+    onAddToFavorites={addToFavorites} 
   />
 ))}
-      </div>
-      {visibleCount < movies.length && (
-  <div className="col-span-full text-center mt-6">
-    <button
-      onClick={() => setVisibleCount(prev => prev + 30)}
-      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition"
-    >
-      Show More
-    </button>
-  </div>
-)}
 
+      </div>
+
+      {/* Show More Button */}
+      {visibleCount < movies.length && (
+        <div className="col-span-full text-center mt-6">
+          <button
+            onClick={() => setVisibleCount((prev) => prev + 30)}
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition"
+          >
+            Show More
+          </button>
+        </div>
+      )}
     </div>
   );
 }
