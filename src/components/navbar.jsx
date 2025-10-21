@@ -1,30 +1,46 @@
-
+import React, { useState, useEffect } from "react";
 import SearchBar from "./searchBar";
 
 function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Detect scroll to change background
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="flex justify-between items-center px-8 py-4 bg-white dark:bg-[#0F172A] text-[#0F172A] dark:text-white shadow-md transition-colors duration-300">
+    <nav
+      className={`fixed  top-0 w-full z-50 flex justify-between items-center px-8 py-4 transition-colors duration-500 ${
+        isScrolled ? "bg-black/80 shadow-lg" : "bg-transparent"
+      }`}
+    >
       {/* Left side - Logo */}
       <div>
-        <h2 className="text-2xl font-bold text-blue-600 dark:text-yellow-400">
-        Movie Explorer
+        <h2 className="text-2xl font-bold text-red-600 hover:text-red-400 transition">
+        Nkiri Movies
         </h2>
       </div>
 
       {/* Right side - Links and Search */}
       <div className="flex items-center gap-6">
-        <ul className="flex gap-6 font-medium">
-          <li className="cursor-pointer hover:text-blue-500 dark:hover:text-yellow-400 transition">
-            Home
-          </li>
-          <li className="cursor-pointer hover:text-blue-500 dark:hover:text-yellow-400 transition">
+        <ul className="hidden md:flex gap-6 font-medium text-white">
+          <li className="cursor-pointer hover:underline transition">Home</li>
+          <li className="cursor-pointer hover:underline transition">
             Favorites
           </li>
         </ul>
 
         {/* Search Bar */}
-        <SearchBar/>
+        <div className="hidden md:block">
+          <SearchBar />
+        </div>
+
+       
       </div>
     </nav>
   );
