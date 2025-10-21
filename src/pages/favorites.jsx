@@ -21,7 +21,7 @@ function Favorites() {
             alt={movie.title}
             className="w-full h-80 object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
+          {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div> */}
 
           {/* Movie Info */}
           <div className="absolute bottom-4 left-4 right-4 z-10 text-white">
