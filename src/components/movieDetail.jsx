@@ -15,7 +15,7 @@ function MovieDetails() {
   if (!movie) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="p-8">
+    <div className=" pt-20 p-4 max-w-3xl mx-auto bg-white rounded shadow">
       <h1 className="text-4xl font-bold mb-4 text-gray-800">{movie.name}</h1>
       <img src={movie.image?.medium} alt={movie.name} className="mb-4" />
       <p className="mb-2">Genres: {movie.genres?.join(", ")}</p>
